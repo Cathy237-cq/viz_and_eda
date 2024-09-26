@@ -139,7 +139,7 @@ how would I fix this? mauybe facet?
 
 ``` r
  weather_df |>
- ggplot(aes(x = tmax, fill = name)) + 
+  ggplot(aes(x = tmax, fill = name)) + 
   geom_histogram ()+
   facet_grid(. ~ name)
 ```
@@ -155,7 +155,7 @@ mayber a density plot?
 
 ``` r
  weather_df |>
- ggplot(aes(x = tmax, fill = name)) + 
+  ggplot(aes(x = tmax, fill = name)) + 
   geom_density (alpha = .3)
 ```
 
@@ -168,7 +168,7 @@ maybe a box plot?
 
 ``` r
  weather_df |>
- ggplot(aes(x = name, y = tmin, fill = name)) + 
+  ggplot(aes(x = name, y = tmin, fill = name)) + 
   geom_boxplot ()
 ```
 
@@ -181,7 +181,7 @@ violin plots
 
 ``` r
  weather_df |>
- ggplot(aes(x = name, y = tmin, fill = name)) + 
+  ggplot(aes(x = name, y = tmin, fill = name)) + 
   geom_violin ()
 ```
 
@@ -194,7 +194,7 @@ ridge plot
 
 ``` r
  weather_df |>
- ggplot(aes(x = tmin, y = name)) + 
+  ggplot(aes(x = tmin, y = name)) + 
   geom_density_ridges()
 ```
 
@@ -204,3 +204,59 @@ ridge plot
     ## (`stat_density_ridges()`).
 
 ![](vis_1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+LA univarite plots
+
+``` r
+ weather_df |>
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density (alpha = .3)
+```
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+weather_df |>
+  ggplot(aes(x = name, y = prcp)) + 
+  geom_boxplot ()
+```
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+
+``` r
+weather_df |>
+  filter(prcp > 10) |>
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density (alpha = .3)
+```
+
+![](vis_1_files/figure-gfm/unnamed-chunk-15-3.png)<!-- -->
+
+## Saving and embedding plots
+
+``` r
+ggp_weather = 
+weather_df |>
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point ()
+
+ggsave("ggp_weather.pdf", ggp_weather, width = 8, height = 6)
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+embedding plots
+
+``` r
+ggp_weather = 
+weather_df |>
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point ()
+```
