@@ -176,3 +176,31 @@ maybe a box plot?
     ## (`stat_boxplot()`).
 
 ![](vis_1_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+violin plots
+
+``` r
+ weather_df |>
+ ggplot(aes(x = name, y = tmin, fill = name)) + 
+  geom_violin ()
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+ridge plot
+
+``` r
+ weather_df |>
+ ggplot(aes(x = tmin, y = name)) + 
+  geom_density_ridges()
+```
+
+    ## Picking joint bandwidth of 1.41
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_density_ridges()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->

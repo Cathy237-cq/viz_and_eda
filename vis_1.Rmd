@@ -93,6 +93,17 @@ maybe a box plot?
   geom_boxplot ()
 ```
 
+violin plots
+```{r}
+ weather_df |>
+ ggplot(aes(x = name, y = tmin, fill = name)) + 
+  geom_violin ()
+```
 
-
+ridge plot
+```{r}
+ weather_df |>
+ ggplot(aes(x = tmin, y = name)) + 
+  geom_density_ridges()
+```
 
