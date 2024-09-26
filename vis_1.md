@@ -96,3 +96,83 @@ ggplot(weather_df, aes(x = tmin, y = tmax)) +
     ## (`geom_point()`).
 
 ![](vis_1_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+## Univarite plots
+
+``` r
+ggplot(weather_df, aes(x = tmax)) + 
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+ggplot(weather_df, aes(x = tmax, fill = name)) + 
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+ggplot(weather_df, aes(x = tmax, fill = name)) + 
+  geom_histogram(position = "dodge")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+how would I fix this? mauybe facet?
+
+``` r
+ weather_df |>
+ ggplot(aes(x = tmax, fill = name)) + 
+  geom_histogram ()+
+  facet_grid(. ~ name)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+mayber a density plot?
+
+``` r
+ weather_df |>
+ ggplot(aes(x = tmax, fill = name)) + 
+  geom_density (alpha = .3)
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+maybe a box plot?
+
+``` r
+ weather_df |>
+ ggplot(aes(x = name, y = tmin, fill = name)) + 
+  geom_boxplot ()
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
