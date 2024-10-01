@@ -23,6 +23,7 @@ library(tidyverse)
 ``` r
 library(patchwork)
 library(ggplot2)
+library(haven)
 ```
 
 ``` r
@@ -325,3 +326,56 @@ try to remove every theme, but only remove one ggp_together =
 theme(legend.position = “none”)
 
 ## Data manipulation
+
+``` r
+weather_df |> 
+  ggplot(aes(x = name, y = tmax, fill =name)) +
+  geom_violin(alpha =.5)
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](vis_2_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+weather_df |> 
+  mutate(name = fct_relevel(name, c("Molokia_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
+  ggplot(aes(x = name, y = tmax, fill =name)) +     
+  geom_violin(alpha =.5)
+```
+
+    ## Warning: There was 1 warning in `mutate()`.
+    ## ℹ In argument: `name = fct_relevel(name, c("Molokia_HI", "CentralPark_NY",
+    ##   "Waterhole_WA"))`.
+    ## Caused by warning:
+    ## ! 1 unknown level in `f`: Molokia_HI
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](vis_2_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+PULSE data next.
+
+``` r
+pulse_df =
+  read_sas("data/public_pulse_data.sas7bdat") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = bdi_score_bl:bdi_score_12m,
+    names_to = "visit",
+    values_to = "bdi_score",
+    names_prefix = "bdi_score"
+  ) |> 
+  mutate(visit = ifelse(visit == "bl", "00m", visit))
+
+pulse_df|> 
+  ggplot(aes(x = visit, y = bdi_score)) +
+  geom_boxplot()
+```
+
+    ## Warning: Removed 879 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](vis_2_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
