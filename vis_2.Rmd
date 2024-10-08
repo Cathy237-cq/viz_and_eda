@@ -208,8 +208,7 @@ try to remove every theme, but only remove one
 ggp_together =
   (ggp_tmax_tmin + ggp_tmax_density)/ ggp_tmax_date +
   theme(legend.position = "none")
-
-
+need to remove for each graph first
 
 ## Data manipulation
 
@@ -221,7 +220,7 @@ weather_df |>
 
 ```{r}
 weather_df |> 
-  mutate(name = fct_relevel(name, c("Molokia_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
+  mutate(name = forcats::fct_relevel(name, c("Molokai_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
   ggplot(aes(x = name, y = tmax, fill =name)) +     
   geom_violin(alpha =.5)
 ```
@@ -246,6 +245,33 @@ pulse_df|>
   ggplot(aes(x = visit, y = bdi_score)) +
   geom_boxplot()
 ```
+
+
+Make an FAS plot
+
+```{r}
+ litters_df =
+   read_csv("data/FAS_litters.csv", na = c("NA",".","")) |> 
+   janitor::clean_names() |> 
+   separate(group, into = c("dose","tx_day", 3))
+
+pups_df =
+  read_csv("data/FAS_pups.csv", na = c("NA",".","")) |> 
+  janitor::clean_names() |> 
+  separate(group, into = c("dose","tx_day"), 3)
+    
+fas_df =
+    left_join(pups_df, litters_df, by ="litter_number")
+
+
+fas_df |> 
+  drop_na(tx_day) |> 
+  ggplot(aes(x = does, y = pn_day)) +
+  geom_boxplot() +
+  facet_grid()
+```
+
+
 
 
 
