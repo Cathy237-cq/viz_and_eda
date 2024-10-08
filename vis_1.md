@@ -60,6 +60,8 @@ weather_df =
 
     ## file min/max dates: 1999-09-01 / 2024-09-30
 
+Making our first plot :-)
+
 ``` r
 ggplot(weather_df, aes(x = tmin, y = tmax))
 ```
@@ -88,8 +90,12 @@ weather_df |>
 ![](vis_1_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
-ggplot(weather_df, aes(x = tmin, y = tmax)) + 
-  geom_point(aes(color = name))
+ ggp_weather_scatterplot = 
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) + 
+   geom_point()
+  
+ggp_weather_scatterplot
 ```
 
     ## Warning: Removed 17 rows containing missing values or values outside the scale range
@@ -97,35 +103,237 @@ ggplot(weather_df, aes(x = tmin, y = tmax)) +
 
 ![](vis_1_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-## Univarite plots
+Check why some rows are missing
 
 ``` r
-ggplot(weather_df, aes(x = tmax)) + 
-  geom_histogram()
+ weather_df |> 
+  filter(is.na(tmax))
 ```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+    ## # A tibble: 17 × 6
+    ##    name         id          date        prcp  tmax  tmin
+    ##    <chr>        <chr>       <date>     <dbl> <dbl> <dbl>
+    ##  1 Molokai_HI   USW00022534 2022-05-31    NA    NA    NA
+    ##  2 Waterhole_WA USS0023B17S 2021-03-09    NA    NA    NA
+    ##  3 Waterhole_WA USS0023B17S 2021-12-07    51    NA    NA
+    ##  4 Waterhole_WA USS0023B17S 2021-12-31     0    NA    NA
+    ##  5 Waterhole_WA USS0023B17S 2022-02-03     0    NA    NA
+    ##  6 Waterhole_WA USS0023B17S 2022-08-09    NA    NA    NA
+    ##  7 Waterhole_WA USS0023B17S 2022-08-10    NA    NA    NA
+    ##  8 Waterhole_WA USS0023B17S 2022-08-11    NA    NA    NA
+    ##  9 Waterhole_WA USS0023B17S 2022-08-12    NA    NA    NA
+    ## 10 Waterhole_WA USS0023B17S 2022-08-13    NA    NA    NA
+    ## 11 Waterhole_WA USS0023B17S 2022-08-14    NA    NA    NA
+    ## 12 Waterhole_WA USS0023B17S 2022-08-15    NA    NA    NA
+    ## 13 Waterhole_WA USS0023B17S 2022-08-16    NA    NA    NA
+    ## 14 Waterhole_WA USS0023B17S 2022-08-17    NA    NA    NA
+    ## 15 Waterhole_WA USS0023B17S 2022-08-18    NA    NA    NA
+    ## 16 Waterhole_WA USS0023B17S 2022-08-19    NA    NA    NA
+    ## 17 Waterhole_WA USS0023B17S 2022-12-31    76    NA    NA
 
-    ## Warning: Removed 17 rows containing non-finite outside the scale range
-    ## (`stat_bin()`).
-
-![](vis_1_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+## Fancier scatterplot
 
 ``` r
-ggplot(weather_df, aes(x = tmax, fill = name)) + 
-  geom_histogram()
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color = name)) + 
+   geom_point(alpha = 0.3, size = 0.8)+
+   geom_smooth(se = FALSE)
 ```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 
     ## Warning: Removed 17 rows containing non-finite outside the scale range
-    ## (`stat_bin()`).
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
 
 ![](vis_1_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
+Where you difine aesthetics can matter
+
+here, geom_point follow the command “only put name in color” but
+geom_smooth is only follow ggpolt, don’t know anything about the color,
+follow the top line of ggplot
+
 ``` r
-ggplot(weather_df, aes(x = tmax, fill = name)) + 
-  geom_histogram(position = "dodge")
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) + 
+   geom_point(aes(color = name), alpha = 0.3, size = 0.8) +
+   geom_smooth(se = FALSE)
+```
+
+    ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+use faceting real quick
+
+``` r
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color = name)) + 
+   geom_point(alpha = .3) +
+   geom_smooth(se = FALSE)+
+  facet_grid(. ~ name)
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color = name)) + 
+   geom_point(alpha = .3) +
+   geom_smooth(se = FALSE)+
+   facet_grid(name ~ .)
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+Let’s make a somewhat more interesting scatterplot
+
+``` r
+ weather_df |>
+   ggplot(aes(x = date, y = tmax, color = name, size = prcp)) +
+   geom_point(alpha = .3) +
+   geom_smooth(se = FALSE) +
+   facet_grid(. ~ name)
+```
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+    ## The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+    ## The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+Learning assessment
+
+``` r
+    weather_df |>
+    filter (name == "CentralPark_NY") |> 
+    mutate(
+      tmax_fahr = tmax * (9/5)+32,
+      tmin_fahr = tmin * (9/5)+32
+    ) |> 
+    ggplot(aes(x = tmin_fahr, y = tmax_fahr, color = name)) + 
+    geom_point(alpha = .3) +
+    geom_smooth(method = "lm", se = FALSE)
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](vis_1_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+## Small things
+
+if only want the line, can just draw the line, not put anything else
+into code
+
+``` r
+ weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) +
+   geom_smooth(se = FALSE)
+```
+
+    ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+``` r
+ weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) +
+   geom_hex()
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_binhex()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+if it’s a variable then do not need quate, if it’s doesn’t a variable
+name, need quate to let R know
+
+``` r
+ weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) +
+   geom_point(color ="blue")
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+here, ggplot identify “blue” as a variable, it acutally create a
+variable and name it “blue”
+
+``` r
+ weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color ="blue")) +
+   geom_point()
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+## Univarite plots
+
+``` r
+ weather_df |> 
+ ggplot(aes(x = tmin)) + 
+   geom_histogram()
 ```
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
@@ -133,14 +341,53 @@ ggplot(weather_df, aes(x = tmax, fill = name)) +
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_bin()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
-how would I fix this? mauybe facet?
+``` r
+ weather_df |> 
+ ggplot(aes(x = tmin, color = name)) + 
+   geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+ weather_df |> 
+ ggplot(aes(x = tmin, fill = name)) + 
+   geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
+ weather_df |> 
+ ggplot(aes(x = tmin, fill = name)) + 
+   geom_histogram(position = "dodge")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+how would I fix this? maybe facet?
 
 ``` r
  weather_df |>
   ggplot(aes(x = tmax, fill = name)) + 
-  geom_histogram ()+
+  geom_histogram () +
   facet_grid(. ~ name)
 ```
 
@@ -149,9 +396,20 @@ how would I fix this? mauybe facet?
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_bin()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 mayber a density plot?
+
+``` r
+ weather_df |>
+  ggplot(aes(x = tmax, fill = name)) + 
+  geom_density ()
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
  weather_df |>
@@ -162,7 +420,7 @@ mayber a density plot?
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_density()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 maybe a box plot?
 
@@ -175,7 +433,7 @@ maybe a box plot?
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_boxplot()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 violin plots
 
@@ -188,7 +446,7 @@ violin plots
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_ydensity()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ridge plot
 
@@ -203,9 +461,22 @@ ridge plot
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_density_ridges()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 LA univarite plots
+
+``` r
+weather_df |>
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_histogram (position = "dodge")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ``` r
  weather_df |>
@@ -216,7 +487,7 @@ LA univarite plots
     ## Warning: Removed 15 rows containing non-finite outside the scale range
     ## (`stat_density()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-28-2.png)<!-- -->
 
 ``` r
 weather_df |>
@@ -227,16 +498,40 @@ weather_df |>
     ## Warning: Removed 15 rows containing non-finite outside the scale range
     ## (`stat_boxplot()`).
 
-![](vis_1_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-28-3.png)<!-- -->
 
 ``` r
 weather_df |>
-  filter(prcp > 10) |>
+  ggplot(aes(x = name, y = prcp, fill = name)) + 
+  geom_violin ()
+```
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-28-4.png)<!-- -->
+
+``` r
+weather_df |>
+  filter(prcp > 10, prcp < 1000) |>
   ggplot(aes(x = prcp, fill = name)) + 
   geom_density (alpha = .3)
 ```
 
-![](vis_1_files/figure-gfm/unnamed-chunk-15-3.png)<!-- -->
+![](vis_1_files/figure-gfm/unnamed-chunk-28-5.png)<!-- -->
+
+``` r
+weather_df |>
+  ggplot(aes(x = prcp, y = name)) + 
+  geom_density_ridges(scale = .85)
+```
+
+    ## Picking joint bandwidth of 9.22
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_density_ridges()`).
+
+![](vis_1_files/figure-gfm/unnamed-chunk-28-6.png)<!-- -->
 
 ## Saving and embedding plots
 
@@ -246,7 +541,7 @@ weather_df |>
   ggplot(aes(x = date, y = tmax, color = name)) + 
   geom_point ()
 
-ggsave("ggp_weather.pdf", ggp_weather, width = 8, height = 6)
+ggsave("plots/ggp_weather.pdf", ggp_weather, width = 8, height = 6)
 ```
 
     ## Warning: Removed 17 rows containing missing values or values outside the scale range
