@@ -30,6 +30,7 @@ weather_df =
   select(name, id, everything())
 ```
 
+Making our first plot :-)
 
 ```{r}
 ggplot(weather_df, aes(x = tmin, y = tmax))
@@ -47,10 +48,82 @@ weather_df |>
 ```
 
 ```{r}
-ggplot(weather_df, aes(x = tmin, y = tmax)) + 
-  geom_point(aes(color = name))
+ ggp_weather_scatterplot = 
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) + 
+   geom_point()
+  
+ggp_weather_scatterplot
 ```
 
+
+Check why some rows are missing
+```{r}
+ weather_df |> 
+  filter(is.na(tmax))
+```
+
+## Fancier scatterplot
+```{r}
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color = name)) + 
+   geom_point(alpha = 0.3, size = 0.8)+
+   geom_smooth(se = FALSE)
+```
+
+Where you difine aesthetics can matter
+
+here, geom_point follow the command "only put name in color"
+but geom_smooth is only follow ggpolt, don't know anything about the color, follow the top line of ggplot
+```{r}
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax)) + 
+   geom_point(aes(color = name), alpha = 0.3, size = 0.8) +
+   geom_smooth(se = FALSE)
+```
+
+use faceting real quick
+ 
+```{r}
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color = name)) + 
+   geom_point(alpha = .3) +
+   geom_smooth(se = FALSE)+
+  facet_grid(. ~ name)
+```
+
+```{r}
+   weather_df |>
+   ggplot(aes(x = tmin, y = tmax, color = name)) + 
+   geom_point(alpha = .3) +
+   geom_smooth(se = FALSE)+
+   facet_grid(name ~ .)
+```
+
+
+Let's make a somewhat more interesting scatterplot
+
+```{r}
+ weather_df |>
+   ggplot(aes(x = date, y = tmax, color = name, size = prcp)) +
+   geom_point(alpha = .3) +
+   geom_smooth(se = FALSE) +
+   facet_grid(. ~ name)
+```
+
+Learning assessment
+
+```{r}
+    weather_df |>
+    filter (name == "CentralPark_NY") |> 
+    mutate(
+      tmax_fahr = tmax * (9/5)+32,
+      tmin_fahr = tmin * (9/5)+32
+    ) |> 
+    ggplot(aes(x = tmin_fahr, y = tmax_fahr, color = name)) + 
+    geom_point(alpha = .3) +
+    geom_smooth(method = "lm", se = FALSE)
+```
 
 
 ## Univarite plots
