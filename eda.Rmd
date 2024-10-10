@@ -169,15 +169,61 @@ format for readers
 ```
 
 
-
-
+## grouped mutates
 
 ```{r}
-
+ weather_df |> 
+  group_by(name) |> 
+  mutate(mean_tmax = mean(tmax, na.rm = TRUE),
+         centered_tmax = tmax - mean_tmax) |> 
+  ggplot(aes(x = date, y = centered_tmax, color = name)) +
+  geom_point()
 ```
 
 
 
+Find hottest / coldest days
+
+
+```{r}
+ weather_df |> 
+  group_by(name) |> 
+  mutate(
+    temp_rank = min_rank(desc(tmax))
+  ) |> 
+  filter(temp_rank < 4)
+
+ weather_df |> 
+  group_by(name) |>
+  filter(min_rank(tmax) < 4) |> 
+  arrange(tmax)
+```
+
+
+```{r}
+ weather_df |> 
+  group_by(name) |> 
+  mutate(
+    lagged_tmax = lag(tmax),
+    temp_change = tmax - lagged_tmax
+  ) |> 
+  filter(min_rank(temp_change) < 3)
+```
+
+
+```{r}
+ weather_df |> 
+  group_by(name) |> 
+  mutate(
+    lagged_tmax = lag(tmax),
+    temp_change = tmax - lagged_tmax
+  ) |> 
+ summarize(
+   sd_tmax_change = sd(temp_change, na.rm = TRUE)
+ )
+```
+
+Learning assessment
 
 
 

@@ -332,3 +332,114 @@ format for readers
 | 2022-10-01 |       17.426 |  29.223 |    11.884 |
 | 2022-11-01 |       14.017 |  27.960 |     2.140 |
 | 2022-12-01 |        6.761 |  27.348 |    -0.460 |
+
+## grouped mutates
+
+``` r
+ weather_df |> 
+  group_by(name) |> 
+  mutate(mean_tmax = mean(tmax, na.rm = TRUE),
+         centered_tmax = tmax - mean_tmax) |> 
+  ggplot(aes(x = date, y = centered_tmax, color = name)) +
+  geom_point()
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](eda_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+Find hottest / coldest days
+
+``` r
+ weather_df |> 
+  group_by(name) |> 
+  mutate(
+    temp_rank = min_rank(desc(tmax))
+  ) |> 
+  filter(temp_rank < 4)
+```
+
+    ## # A tibble: 16 × 8
+    ## # Groups:   name [3]
+    ##    name           id          date        prcp  tmax  tmin month      temp_rank
+    ##    <chr>          <chr>       <date>     <dbl> <dbl> <dbl> <date>         <int>
+    ##  1 CentralPark_NY USW00094728 2021-06-29     0  35    25.6 2021-06-01         3
+    ##  2 CentralPark_NY USW00094728 2021-06-30   165  36.7  22.8 2021-06-01         1
+    ##  3 CentralPark_NY USW00094728 2022-07-20     0  35    25.6 2022-07-01         3
+    ##  4 CentralPark_NY USW00094728 2022-07-23     0  35    25.6 2022-07-01         3
+    ##  5 CentralPark_NY USW00094728 2022-07-24     0  35    26.1 2022-07-01         3
+    ##  6 CentralPark_NY USW00094728 2022-08-09     8  36.1  25.6 2022-08-01         2
+    ##  7 Molokai_HI     USW00022534 2021-05-31     0  32.2  17.2 2021-05-01         2
+    ##  8 Molokai_HI     USW00022534 2021-09-16     0  32.2  21.1 2021-09-01         2
+    ##  9 Molokai_HI     USW00022534 2022-07-30     0  32.2  22.2 2022-07-01         2
+    ## 10 Molokai_HI     USW00022534 2022-08-06     0  33.3  20.6 2022-08-01         1
+    ## 11 Molokai_HI     USW00022534 2022-08-17     0  32.2  21.1 2022-08-01         2
+    ## 12 Molokai_HI     USW00022534 2022-09-24     0  32.2  22.2 2022-09-01         2
+    ## 13 Molokai_HI     USW00022534 2022-09-30     0  32.2  20   2022-09-01         2
+    ## 14 Waterhole_WA   USS0023B17S 2021-06-27     0  28.5  17.6 2021-06-01         3
+    ## 15 Waterhole_WA   USS0023B17S 2021-06-28     0  30.8  20.7 2021-06-01         2
+    ## 16 Waterhole_WA   USS0023B17S 2021-06-29     0  32.4  17.6 2021-06-01         1
+
+``` r
+ weather_df |> 
+  group_by(name) |>
+  filter(min_rank(tmax) < 4) |> 
+  arrange(tmax)
+```
+
+    ## # A tibble: 9 × 7
+    ## # Groups:   name [3]
+    ##   name           id          date        prcp  tmax  tmin month     
+    ##   <chr>          <chr>       <date>     <dbl> <dbl> <dbl> <date>    
+    ## 1 Waterhole_WA   USS0023B17S 2021-12-26   102 -11.4 -18.3 2021-12-01
+    ## 2 Waterhole_WA   USS0023B17S 2021-12-27    25  -9.8 -19.6 2021-12-01
+    ## 3 Waterhole_WA   USS0023B17S 2022-12-21     0  -9.6 -18.4 2022-12-01
+    ## 4 CentralPark_NY USW00094728 2022-12-24     0  -9.3 -13.8 2022-12-01
+    ## 5 CentralPark_NY USW00094728 2022-01-15     0  -6   -12.1 2022-01-01
+    ## 6 CentralPark_NY USW00094728 2022-01-21     0  -5.5  -9.9 2022-01-01
+    ## 7 Molokai_HI     USW00022534 2021-03-18   142  21.7  18.9 2021-03-01
+    ## 8 Molokai_HI     USW00022534 2021-01-18   234  22.2  19.4 2021-01-01
+    ## 9 Molokai_HI     USW00022534 2022-11-28    56  22.2  20.6 2022-11-01
+
+``` r
+ weather_df |> 
+  group_by(name) |> 
+  mutate(
+    lagged_tmax = lag(tmax),
+    temp_change = tmax - lagged_tmax
+  ) |> 
+  filter(min_rank(temp_change) < 3)
+```
+
+    ## # A tibble: 6 × 9
+    ## # Groups:   name [3]
+    ##   name     id    date        prcp  tmax  tmin month      lagged_tmax temp_change
+    ##   <chr>    <chr> <date>     <dbl> <dbl> <dbl> <date>           <dbl>       <dbl>
+    ## 1 Central… USW0… 2022-02-24     0   1.7  -1.6 2022-02-01        20         -18.3
+    ## 2 Central… USW0… 2022-12-24     0  -9.3 -13.8 2022-12-01        14.4       -23.7
+    ## 3 Molokai… USW0… 2021-01-18   234  22.2  19.4 2021-01-01        27.8        -5.6
+    ## 4 Molokai… USW0… 2022-11-28    56  22.2  20.6 2022-11-01        27.2        -5  
+    ## 5 Waterho… USS0… 2021-06-30     0  21.5  10.9 2021-06-01        32.4       -10.9
+    ## 6 Waterho… USS0… 2022-06-28     0  12.4   5.7 2022-06-01        23.6       -11.2
+
+``` r
+ weather_df |> 
+  group_by(name) |> 
+  mutate(
+    lagged_tmax = lag(tmax),
+    temp_change = tmax - lagged_tmax
+  ) |> 
+ summarize(
+   sd_tmax_change = sd(temp_change, na.rm = TRUE)
+ )
+```
+
+    ## # A tibble: 3 × 2
+    ##   name           sd_tmax_change
+    ##   <chr>                   <dbl>
+    ## 1 CentralPark_NY           4.43
+    ## 2 Molokai_HI               1.24
+    ## 3 Waterhole_WA             3.04
+
+Learning assessment
