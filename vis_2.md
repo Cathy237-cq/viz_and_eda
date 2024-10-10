@@ -323,7 +323,7 @@ ggp_tmax_date =
 
 try to remove every theme, but only remove one ggp_together =
 (ggp_tmax_tmin + ggp_tmax_density)/ ggp_tmax_date +
-theme(legend.position = “none”)
+theme(legend.position = “none”) need to remove for each graph first
 
 ## Data manipulation
 
@@ -340,16 +340,10 @@ weather_df |>
 
 ``` r
 weather_df |> 
-  mutate(name = fct_relevel(name, c("Molokia_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
+  mutate(name = forcats::fct_relevel(name, c("Molokai_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
   ggplot(aes(x = name, y = tmax, fill =name)) +     
   geom_violin(alpha =.5)
 ```
-
-    ## Warning: There was 1 warning in `mutate()`.
-    ## ℹ In argument: `name = fct_relevel(name, c("Molokia_HI", "CentralPark_NY",
-    ##   "Waterhole_WA"))`.
-    ## Caused by warning:
-    ## ! 1 unknown level in `f`: Molokia_HI
 
     ## Warning: Removed 17 rows containing non-finite outside the scale range
     ## (`stat_ydensity()`).
@@ -379,3 +373,59 @@ pulse_df|>
     ## (`stat_boxplot()`).
 
 ![](vis_2_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+Make an FAS plot
+
+``` r
+ litters_df =
+   read_csv("data/FAS_litters.csv", na = c("NA",".","")) |> 
+   janitor::clean_names() |> 
+   separate(group, into = c("dose","tx_day"), 3)
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+pups_df =
+  read_csv("data/FAS_pups.csv", na = c("NA",".","")) |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    pd_ears:pd_walk,
+    names_to = "outcome",
+    values_to = "pn_day",
+    names_prefix = "pd_"
+  )
+```
+
+    ## Rows: 313 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): Litter Number
+    ## dbl (5): Sex, PD ears, PD eyes, PD pivot, PD walk
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+fas_df =
+    left_join(pups_df, litters_df, by ="litter_number")
+
+
+fas_df |>
+  drop_na(tx_day) |> 
+  ggplot(aes(x = dose, y = pn_day)) +
+  geom_boxplot() +
+  facet_grid(tx_day ~ outcome)
+```
+
+    ## Warning: Removed 42 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](vis_2_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
